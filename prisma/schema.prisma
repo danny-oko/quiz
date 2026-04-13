@@ -7,17 +7,25 @@ datasource db {
   provider = "postgresql"
 }
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-  posts Post[]
-} 
-model Post { 
-  id        Int     @id @default(autoincrement()) 
-  title     String
-  content   String?
-  published Boolean @default(false) 
-  authorId  Int
-  author    User    @relation(fields: [authorId], references: [id]) 
-} 
+model Article {
+  id Int @id @default(autoincrement())
+  title String
+  content String
+  sumarry String
+  userId Int 
+  // user  
+  createdAt DateTime @default(now()) 
+  updatedAt DateTime @updatedAt
+  quizzes Quiz[]
+}
+
+model Quiz {
+  id Int @id @default(autoincrement())
+  question String
+  options String[]
+  answer String
+  articleId Int 
+  article Article @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now()) 
+  updatedAt DateTime @updatedAt
+}
