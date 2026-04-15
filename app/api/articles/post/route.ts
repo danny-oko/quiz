@@ -27,7 +27,16 @@ export async function POST(req: NextRequest) {
   // 3. Generate summary + quiz in parallel
   try {
     const summaryPrompt = `Please provide a concise summary of the following article: ${content}`;
-    const quizPrompt = `Generate 5 multiple choice questions based on this article: ${content} Return ONLY a valid JSON array with no markdown or explanation: [ { "question": "Question text here", "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "answer": "0" } ] The answer must be the index (0-3) of the correct option as a string.`;
+    const quizPrompt = `Generate 5 multiple choice questions based on this article: ${content} 
+      Return ONLY a valid JSON array: 
+      [ 
+        { 
+          "question": "Question text here", 
+          "options": ["Option 1", "Option 2", "Option 3", "Option 4"], 
+          "answer": "Option 1" 
+        } 
+      ] 
+      The "answer" field MUST match the exact text of the correct option from the "options" array.`;
 
     const [summaryRes, quizRes] = await Promise.all([
       ai.models.generateContent({ model: MODEL, contents: summaryPrompt }),
@@ -40,7 +49,6 @@ export async function POST(req: NextRequest) {
     console.log("summary:", summary);
     console.log("quiz raw:", quizRaw);
 
-    // 4. Parse quiz JSON
     let quizzes: { question: string; options: string[]; answer: string }[] = [];
     try {
       const cleaned = quizRaw.replace(/```json|```/g, "").trim();
@@ -49,7 +57,6 @@ export async function POST(req: NextRequest) {
       console.error("Quiz JSON parse failed:", parseError);
     }
 
-    // 5. Save article + quizzes
     const article = await prisma.article.create({
       data: {
         title,

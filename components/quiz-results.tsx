@@ -2,7 +2,7 @@
 
 import { CheckCircle2, XCircle, RotateCcw, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Quiz } from "@/lib/common/type"; // Using your Quiz type
+import { Quiz } from "@/lib/common/type"; 
 
 interface QuizResultProps {
   questions: Quiz[];
@@ -57,11 +57,11 @@ export function QuizResults({
                   </p>
                   <p className="text-slate-900">
                     Your answer:{" "}
-                    <span className="font-bold">{userAnswers[idx + 1]}</span>
+                    <span className="font-bold">{userAnswers[idx]}</span>
                   </p>
                   {!isCorrect && (
                     <p className="text-green-600 font-bold">
-                      Correct: {Number(q.answer) + 1}
+                      Correct: {q.answer}
                     </p>
                   )}
                 </div>
