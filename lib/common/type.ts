@@ -1,12 +1,10 @@
-// File: @/lib/common/type.ts (or wherever your types are)
-
 export type Quiz = {
-  id: number; // Changed from string to number to match DB
-  question: string; // Added missing field from DB
+  id: number;
+  question: string;
   answer: string;
   options: string[];
   articleId: number;
-  createdAt: Date; // Changed to Date to match Prisma output
+  createdAt: Date;
 };
 
 export type Article = {
