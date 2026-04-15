@@ -5,11 +5,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { FileText, LoaderCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [body, setBody] = useState({ title: "", content: "" });
   const [result, setResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -30,7 +33,11 @@ export default function Page() {
       });
 
       const data = await res.json();
+      router.refresh();
       setResult(data.summary);
+
+      const articleId = String(data.id);
+      router.push(`/dashboard/${articleId}`);
     } catch (err) {
       console.error("Generation failed:", err);
     } finally {
