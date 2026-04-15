@@ -1,11 +1,27 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import prisma from "@/lib/prisma";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { userId } = await auth();
+  console.log(userId);
+
+  const articles = userId
+    ? await prisma.article.findMany({
+        where: { userId: userId },
+        orderBy: { createdAt: "desc" },
+      })
+    : [];
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar articles={articles} />
       <SidebarInset>
         <header className="flex justify-between items-center px-6 h-14 border-b bg-white shrink-0">
           <span className="text-4xl font-bold text-base tracking-tight">
