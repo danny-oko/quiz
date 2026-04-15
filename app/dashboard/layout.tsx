@@ -10,11 +10,13 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const { userId } = await auth();
-  console.log(userId);
 
   const articles = userId
     ? await prisma.article.findMany({
         where: { userId: userId },
+        include: {
+          quizzes: true,
+        },
         orderBy: { createdAt: "desc" },
       })
     : [];
@@ -24,15 +26,13 @@ export default async function Layout({
       <AppSidebar articles={articles} />
       <SidebarInset>
         <header className="flex justify-between items-center px-6 h-14 border-b bg-white shrink-0">
-          <span className="text-4xl font-bold text-base tracking-tight">
-            Quiz app
-          </span>
+          <span className="font-bold text-lg tracking-tight">Quiz app</span>
           <div className="flex items-center gap-4">
             <Show when="signed-out">
               <div className="flex items-center gap-4">
                 <SignInButton />
                 <SignUpButton>
-                  <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm h-10 px-4 cursor-pointer">
+                  <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm h-10 px-4 cursor-pointer hover:bg-[#5a3ae6] transition-colors">
                     Sign Up
                   </button>
                 </SignUpButton>

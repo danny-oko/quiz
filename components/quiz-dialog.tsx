@@ -39,7 +39,8 @@ export function QuizDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl bg-slate-50">
+      {/* Added h-auto and max-h to prevent content bleed */}
+      <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl bg-slate-50 flex flex-col">
         {showResults ? (
           <div className="p-6">
             <QuizResults
@@ -81,21 +82,28 @@ export function QuizDialog({
             </div>
 
             <div className="p-6 pt-2">
-              <div className="bg-white border rounded-2xl p-6 shadow-sm space-y-6">
+              {/* Added flex-col and w-full to the inner card */}
+              <div className="bg-white border rounded-2xl p-6 shadow-sm flex flex-col gap-6">
                 <div className="flex justify-between items-start gap-4">
-                  <h3 className="font-bold text-lg leading-snug text-left">
+                  <h3 className="font-bold text-lg leading-snug text-left text-slate-900">
                     {currentQuiz?.question}
                   </h3>
-                  <span className="text-sm font-bold text-slate-300 tabular-nums">
+                  <span className="text-sm font-bold text-slate-300 tabular-nums shrink-0">
                     {currentStep + 1} / {quizData.length}
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                {/* Changed to grid-cols-1 by default to handle long text safely */}
+                <div className="grid grid-cols-1 gap-3">
                   {currentQuiz?.options.map((option) => (
                     <Button
                       key={option}
                       variant="outline"
-                      className={`h-auto min-h-[3rem] py-3 text-center transition-all ${userAnswers[currentStep] === option ? "border-black ring-1 ring-black bg-slate-50" : "border-slate-100"}`}
+                      className={`h-auto min-h-[3.5rem] py-3 px-4 justify-start text-left whitespace-normal break-words font-medium transition-all duration-200 ${
+                        userAnswers[currentStep] === option
+                          ? "border-black bg-slate-50 ring-1 ring-black shadow-sm"
+                          : "border-slate-100 hover:border-slate-300 hover:bg-slate-50/50"
+                      }`}
                       onClick={() =>
                         setUserAnswers({
                           ...userAnswers,
@@ -114,7 +122,7 @@ export function QuizDialog({
               <Button
                 disabled={!userAnswers[currentStep]}
                 onClick={handleNext}
-                className="bg-black text-white px-8 rounded-lg h-11"
+                className="bg-black text-white px-8 rounded-lg h-11 hover:bg-zinc-800"
               >
                 {currentStep === quizData.length - 1
                   ? "Finish"
