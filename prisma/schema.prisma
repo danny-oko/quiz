@@ -7,23 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        String    @id
-  email     String    @unique
-  name      String?
-  imageUrl  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  articles  Article[]
-}
-
 model Article {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
   summary   String
-  userId    String                    
-  user      User     @relation(fields: [userId], references: [id]) 
+  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   quizzes   Quiz[]

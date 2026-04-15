@@ -1,32 +1,81 @@
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-// Using the unified 2026 client
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const MODEL = "gemini-3-flash-preview";
 
 export async function POST(req: NextRequest) {
-  try {
-    const { question } = await req.json();
+  // 1. Auth
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  console.log("User id:", userId);
 
-    // In @google/genai, use ai.models.generateContent
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
-      contents: [{ role: "user", parts: [{ text: question }] }],
-      config: {
-        // System instructions are part of the 'config' block in this SDK
-        systemInstruction:
-          "You are a concise food assistant. Answer in plain, direct language. No headers, no bullet walls, no fluff. Get straight to the point.",
-        maxOutputTokens: 120,
-        temperature: 0.3,
-        topP: 0.8,
-        topK: 20,
+  // 2. Validate body
+  const { title, content } = await req.json();
+  if (!title || !content) {
+    return NextResponse.json(
+      { message: "All fields are required!" },
+      { status: 400 },
+    );
+  }
+  console.log("title:", title, "content:", content);
+
+  // 3. Generate summary + quiz in parallel
+  try {
+    const summaryPrompt = `Please provide a concise summary of the following article: ${content}`;
+    const quizPrompt = `Generate 5 multiple choice questions based on this article: ${content} Return ONLY a valid JSON array with no markdown or explanation: [ { "question": "Question text here", "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "answer": "0" } ] The answer must be the index (0-3) of the correct option as a string.`;
+
+    const [summaryRes, quizRes] = await Promise.all([
+      ai.models.generateContent({ model: MODEL, contents: summaryPrompt }),
+      ai.models.generateContent({ model: MODEL, contents: quizPrompt }),
+    ]);
+
+    const summary = summaryRes.text?.trim() ?? "";
+    const quizRaw = quizRes.text?.trim() ?? "";
+
+    console.log("summary:", summary);
+    console.log("quiz raw:", quizRaw);
+
+    // 4. Parse quiz JSON
+    let quizzes: { question: string; options: string[]; answer: string }[] = [];
+    try {
+      const cleaned = quizRaw.replace(/```json|```/g, "").trim();
+      quizzes = JSON.parse(cleaned);
+    } catch (parseError) {
+      console.error("Quiz JSON parse failed:", parseError);
+    }
+
+    // 5. Save article + quizzes
+    const article = await prisma.article.create({
+      data: {
+        title,
+        content,
+        summary,
+        userId,
+        quizzes: {
+          create: quizzes.map((q) => ({
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+          })),
+        },
       },
+      include: { quizzes: true },
     });
 
-    // In this SDK, the text is returned directly on the response object
-    return NextResponse.json({ answer: response.text });
+    console.log("Saved article id:", article.id);
+
+    return NextResponse.json({
+      id: article.id,
+      summary: article.summary,
+      quizzes: article.quizzes,
+    });
   } catch (error) {
-    console.error("AI Assistant Error:", error);
-    return NextResponse.json({ error: "Service unavailable" }, { status: 500 });
+    console.error("Error:", error);
+    return NextResponse.json({ error: `${error}` }, { status: 500 });
   }
 }
