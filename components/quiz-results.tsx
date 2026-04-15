@@ -57,11 +57,11 @@ export function QuizResults({
                   </p>
                   <p className="text-slate-900">
                     Your answer:{" "}
-                    <span className="font-bold">{userAnswers[idx]}</span>
+                    <span className="font-bold">{userAnswers[idx + 1]}</span>
                   </p>
                   {!isCorrect && (
                     <p className="text-green-600 font-bold">
-                      Correct: {q.answer}
+                      Correct: {Number(q.answer) + 1}
                     </p>
                   )}
                 </div>

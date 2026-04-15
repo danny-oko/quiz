@@ -39,7 +39,6 @@ export function QuizDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {/* Added h-auto and max-h to prevent content bleed */}
       <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl bg-slate-50 flex flex-col">
         {showResults ? (
           <div className="p-6">
@@ -82,7 +81,6 @@ export function QuizDialog({
             </div>
 
             <div className="p-6 pt-2">
-              {/* Added flex-col and w-full to the inner card */}
               <div className="bg-white border rounded-2xl p-6 shadow-sm flex flex-col gap-6">
                 <div className="flex justify-between items-start gap-4">
                   <h3 className="font-bold text-lg leading-snug text-left text-slate-900">
@@ -93,7 +91,6 @@ export function QuizDialog({
                   </span>
                 </div>
 
-                {/* Changed to grid-cols-1 by default to handle long text safely */}
                 <div className="grid grid-cols-1 gap-3">
                   {currentQuiz?.options.map((option) => (
                     <Button
