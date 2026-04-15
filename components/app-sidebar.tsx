@@ -27,11 +27,11 @@ export function AppSidebar({ articles }: { articles: Article[] }) {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4 border-b">
-        <div className="flex items-center gap-2 font-semibold text-lg">
+      <SidebarHeader>
+        {/* <div className="flex items-center gap-2 font-semibold text-lg">
           <LayoutDashboard className="w-5 h-5 text-blue-600" />
           <span>Quiz AI</span>
-        </div>
+        </div> */}
       </SidebarHeader>
 
       <SidebarContent>

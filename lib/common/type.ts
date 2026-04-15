@@ -4,6 +4,7 @@ export type Article = {
   title: string;
   content: string;
   summary: string;
+  quizzes: Quiz[];
   createdAt: Date;
   updatedAt: Date;
 };

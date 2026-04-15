@@ -9,18 +9,10 @@ export async function GET(
     const resolvedParams = await params;
     const id = resolvedParams.id;
 
-    console.log("Fetching ID from path:", id);
-
-    if (!id || id === "undefined") {
-      return NextResponse.json(
-        { error: "Invalid or missing ID" },
-        { status: 400 },
-      );
-    }
-
     const article = await prisma.article.findUnique({
-      where: {
-        id: Number(id),
+      where: { id: Number(id) },
+      include: {
+        quizzes: true,
       },
     });
 
