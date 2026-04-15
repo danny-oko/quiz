@@ -39,7 +39,7 @@ export default function Page() {
       const articleId = String(data.id);
       router.push(`/dashboard/${articleId}`);
     } catch (err) {
-      console.error("Generation failed:", err);
+      console.error("Generation failed:");
     } finally {
       setIsLoading(false);
     }
