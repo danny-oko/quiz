@@ -1,9 +1,11 @@
 "use client";
+
+import debounce from "debounce";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { FileText, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function Page() {
   const [body, setBody] = useState<{ title: string; content: string }>({
@@ -11,13 +13,18 @@ export default function Page() {
     content: "",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setBody((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleChange = useMemo(
+    () =>
+      debounce(
+        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+          setBody((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        },
+        300,
+      ),
+    [],
+  );
 
-  console.log(body)
+  console.log(body);
 
   const isDisabled = !body.title.trim() || !body.content.trim();
 
@@ -43,7 +50,7 @@ export default function Page() {
           <Input
             placeholder="Enter a title for your article..."
             name="title"
-            value={body.title}
+            defaultValue={body.title}
             onChange={handleChange}
           />
         </div>
@@ -57,7 +64,7 @@ export default function Page() {
             placeholder="Paste your article content here..."
             className="min-h-36 resize-none"
             name="content"
-            value={body.content}
+            defaultValue={body.content}
             onChange={handleChange}
           />
         </div>
